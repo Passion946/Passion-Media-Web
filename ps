@@ -1,0 +1,154 @@
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  i18n: {
+    locales: ['ar', 'en', 'tr'],
+    defaultLocale: 'ar',
+    localeDetection: true,
+  },
+};
+
+module.exports = nextConfig;
+
+
+// tailwind.config.js
+module.exports = {
+  content: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#a34f9c',
+        secondary: '#393d96',
+        highlight: '#f5ed29',
+      },
+    },
+  },
+  plugins: [],
+  darkMode: 'class',
+};
+
+
+// postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
+
+
+// styles/globals.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+// pages/_app.tsx
+import '../styles/globals.css';
+import type { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+
+export default function App({ Component, pageProps }: AppProps) {
+  const { locale } = useRouter();
+
+  useEffect(() => {
+    document.dir = locale === 'ar' ? 'rtl' : 'ltr';
+  }, [locale]);
+
+  return <Component {...pageProps} />;
+}
+
+
+// pages/index.tsx
+import Head from 'next/head';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+export default function Home() {
+  return (
+    <>
+      <Head>
+        <title>باشن ميديا - Passion Media</title>
+      </Head>
+      <Header />
+      <main className="text-center p-10 bg-primary text-white min-h-screen">
+        <h1 className="text-4xl font-bold mb-4">مرحباً بكم في باشن ميديا</h1>
+        <p className="text-lg max-w-xl mx-auto">
+          وكالة شبابية مختصة في التسويق الرقمي، نقدم حلولًا مبتكرة لخدمة علامتك التجارية.
+        </p>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+
+// components/Header.tsx
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+const Header = () => {
+  const router = useRouter();
+  const { locale, locales, pathname, asPath, query } = router;
+
+  const changeLanguage = (lng: string) => {
+    router.push({ pathname, query }, asPath, { locale: lng });
+  };
+
+  return (
+    <header className="bg-secondary text-white flex justify-between items-center px-6 py-4">
+      <div className="font-bold text-xl">باشن ميديا</div>
+      <nav className="space-x-4 rtl:space-x-reverse">
+        <Link href="/">الرئيسية</Link>
+        <Link href="/services">الخدمات</Link>
+        <Link href="/portfolio">الأعمال</Link>
+        <Link href="/clients">عملاؤنا</Link>
+        <Link href="/news">الأخبار</Link>
+        <Link href="/contact">تواصل معنا</Link>
+      </nav>
+      <div className="space-x-2 rtl:space-x-reverse">
+        {locales?.map((lng) => (
+          <button key={lng} onClick={() => changeLanguage(lng)} className="underline">
+            {lng.toUpperCase()}
+          </button>
+        ))}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+
+
+// components/Footer.tsx
+const Footer = () => (
+  <footer className="bg-secondary text-white text-center py-4 mt-10">
+    <p>© {new Date().getFullYear()} باشن ميديا. جميع الحقوق محفوظة.</p>
+  </footer>
+);
+
+export default Footer;
